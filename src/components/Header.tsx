@@ -1,7 +1,11 @@
-const Header = () => {
+type HeaderProps = {
+  title?: string;
+};
+
+const Header = ({ title = "Default Title" }: HeaderProps) => {
   return (
     <header>
-      <h1>Groceries List</h1>
+      <h1>{title}</h1>
     </header>
   );
 };
