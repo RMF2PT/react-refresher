@@ -4,6 +4,7 @@ import AddItem from "./components/AddItem";
 import SearchItem from "./components/SearchItem";
 import Content from "./components/Content";
 import Footer from "./components/Footer";
+import apiRequest from "./apiRequest";
 
 export type ItemType = {
   id: number;
@@ -34,12 +35,13 @@ function App() {
         setIsLoading(false);
       }
     };
+    // TODO - Remove setTimeout
     setTimeout(() => {
       fetchItems();
     }, 2000);
   }, []);
 
-  const addItem = (item: string) => {
+  const addItem = async (item: string) => {
     // Create new id for the item
     const id: number = Math.floor(Math.random() * 10000) + 1;
     // Create new item object
@@ -49,18 +51,64 @@ function App() {
     setItems(listItems);
     // Reset the input field
     setNewItem("");
+    // Add new item to the database
+    // Create options object for the POST request
+    const postOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newItemInput),
+    };
+    // Make the POST request
+    const result = await apiRequest({
+      url: API_URL,
+      optionsObj: postOptions,
+    });
+    // If the apiRequest returns an error, set the fetch error state
+    if (result) setFetchError(result);
   };
 
-  const handleCheck = (id: number) => {
+  const handleCheck = async (id: number) => {
     const listItems = items.map((item) =>
       item.id === id ? { ...item, checked: !item.checked } : item
     );
     setItems(listItems);
+    // Update the database
+    // Get the item that was checked
+    const item = listItems.find((item) => item.id === id) as ItemType;
+    // Create options object for the PATCH request and send only the property that was updated
+    const patchOptions = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ checked: item.checked }),
+    };
+    // Add the id to the url
+    const url = `${API_URL}/${id}`;
+    // Make the PATCH request
+    const result = await apiRequest({
+      url: url,
+      optionsObj: patchOptions,
+    });
+    // If the apiRequest returns an error, set the fetch error state
+    if (result) setFetchError(result);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     const listItems = items.filter((item) => item.id !== id);
     setItems(listItems);
+    // Delete the item from the database
+    // Create options object for the DELETE request
+    const deleteOptions = {
+      method: "DELETE",
+    };
+    // Add the id to the url
+    const url = `${API_URL}/${id}`;
+    // Make the DELETE request
+    const result = await apiRequest({
+      url: url,
+      optionsObj: deleteOptions,
+    });
+    // If the apiRequest returns an error, set the fetch error state
+    if (result) setFetchError(result);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
