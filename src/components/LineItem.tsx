@@ -17,7 +17,7 @@ const LineItem = ({ item, handleCheck, handleDelete }: LineItemProps) => {
         onChange={() => handleCheck(item.id)}
       />
       <label
-        // htmlFor={item.id.toString()}
+        htmlFor={item.id.toString()}
         onDoubleClick={() => handleCheck(item.id)}
         className={item.checked ? "checked" : ""}
       >

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import AddItem from "./components/AddItem";
 import SearchItem from "./components/SearchItem";
@@ -13,15 +13,16 @@ export type ItemType = {
 
 function App() {
   const [items, setItems] = useState(
-    JSON.parse(localStorage.getItem("shoppingList") || "") as ItemType[]
+    localStorage.getItem("shoppingList")
+      ? (JSON.parse(localStorage.getItem("shoppingList") || "") as ItemType[])
+      : []
   );
   const [newItem, setNewItem] = useState("");
   const [search, setSearch] = useState("");
 
-  const saveList = (listItems: ItemType[]) => {
-    setItems(listItems);
-    localStorage.setItem("shoppingList", JSON.stringify(listItems));
-  };
+  useEffect(() => {
+    localStorage.setItem("shoppingList", JSON.stringify(items));
+  }, [items]);
 
   const addItem = (item: string) => {
     // Create new id for the item
@@ -30,7 +31,7 @@ function App() {
     const newItemInput = { id, checked: false, name: item } as ItemType;
     // Create new array with the new item
     const listItems = [...items, newItemInput];
-    saveList(listItems);
+    setItems(listItems);
     // Reset the input field
     setNewItem("");
   };
@@ -39,12 +40,12 @@ function App() {
     const listItems = items.map((item) =>
       item.id === id ? { ...item, checked: !item.checked } : item
     );
-    saveList(listItems);
+    setItems(listItems);
   };
 
   const handleDelete = (id: number) => {
     const listItems = items.filter((item) => item.id !== id);
-    saveList(listItems);
+    setItems(listItems);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
