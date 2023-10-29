@@ -196,3 +196,19 @@ button:hover {
   border-radius: 0.25rem;
   outline: none;
 }
+
+.error {
+  color: red;
+  font-size: 0.75rem;
+  margin: 0.25rem 0;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  font-size: 1.5rem;
+  color: #aaa;
+}

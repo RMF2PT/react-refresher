@@ -12,17 +12,32 @@ export type ItemType = {
 };
 
 function App() {
-  const [items, setItems] = useState(
-    localStorage.getItem("shoppingList")
-      ? (JSON.parse(localStorage.getItem("shoppingList") || "") as ItemType[])
-      : []
-  );
+  const API_URL = "http://localhost:3500/items";
+
+  const [items, setItems] = useState([] as ItemType[]);
   const [newItem, setNewItem] = useState("");
   const [search, setSearch] = useState("");
+  const [fetchError, setFetchError] = useState(null as null | string);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem("shoppingList", JSON.stringify(items));
-  }, [items]);
+    const fetchItems = async () => {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw Error("Failed to load database");
+        const data = await res.json();
+        setItems(data);
+        setFetchError(null);
+      } catch (error) {
+        if (error instanceof Error) setFetchError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    setTimeout(() => {
+      fetchItems();
+    }, 2000);
+  }, []);
 
   const addItem = (item: string) => {
     // Create new id for the item
@@ -70,11 +85,17 @@ function App() {
         handleSubmit={handleSubmit}
       />
       <SearchItem search={search} setSearch={setSearch} />
-      <Content
-        items={filteredItems}
-        handleCheck={handleCheck}
-        handleDelete={handleDelete}
-      />
+      <main>
+        {isLoading && <p className="loading">Loading...</p>}
+        {fetchError && <p className="error">{`Error: ${fetchError}`}</p>}
+        {!fetchError && !isLoading && (
+          <Content
+            items={filteredItems}
+            handleCheck={handleCheck}
+            handleDelete={handleDelete}
+          />
+        )}
+      </main>
       <Footer length={items.length} />
     </>
   );

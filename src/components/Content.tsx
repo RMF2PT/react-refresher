@@ -9,7 +9,7 @@ type ContentProps = {
 
 const Content = ({ items, handleCheck, handleDelete }: ContentProps) => {
   return (
-    <main>
+    <>
       {items.length === 0 ? (
         <p className="empty">No items in the list</p>
       ) : (
@@ -19,7 +19,7 @@ const Content = ({ items, handleCheck, handleDelete }: ContentProps) => {
           handleDelete={handleDelete}
         />
       )}
-    </main>
+    </>
   );
 };
 export default Content;
